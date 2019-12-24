@@ -24,10 +24,10 @@ def integrator( ins ):
   #print('max integrator {}'.format(max(out)))
   return out
 
-def comb( ins, M ):
+def comb( ins, M, R):
   delay = np.zeros(ins.size)
   delay[M:] = ins[0:-M]
-  return ins - delay
+  return (ins - delay)/R*M
 
 def sample( ins, R, P):
   sample_num = int((ins.size-P)/R)
@@ -44,9 +44,9 @@ def CIC( ins, R, N, M ):
 
   inte_samp = sample(inte_out, R, P)
 
-  comb_out = comb(inte_samp, M)
+  comb_out = comb(inte_samp, M, R)
 
-  return comb_out/(R*M)
+  return comb_out
 
 def integrator_q( ins, R):
   reg = 0
@@ -59,22 +59,30 @@ def integrator_q( ins, R):
 def comb_q( ins, M, R):
   delay = np.zeros(ins.size)
   delay[M:] = ins[0:-M]
-  comb_out = np.floor((ins - delay)*2**(MAX_BITS+R-1))/2**R
-  comb_out_q = comb_out/2**(MAX_BITS-1)
+  comb_out = np.floor((ins - delay)*2**(MAX_BITS+R-1))/2**(MAX_BITS+R-1)
+  comb_out_q = np.floor((comb_out/2**R)*2**(MAX_BITS-1))/2**(MAX_BITS-1)
+
+  #comb_out = ((ins - delay)*2**(MAX_BITS+R-1))/2**(MAX_BITS+R-1)
+  #comb_out_q = (comb_out)/2**R
+
+  #comb_out = (ins - delay)
+  #comb_out_q = (comb_out)/(2**R)
 
   return np.clip(comb_out_q,-1,(2**(MAX_BITS-1)-1)/2**(MAX_BITS-1))
+  #return comb_out_q
 
 def CIC_Q( ins, R, N, M ):
   P = int(R/2) #sample phase
 
-  ins_c = np.clip(ins, -1, (2**(MAX_BITS-1)-1)/2**(MAX_BITS-1))
-  ins_q = np.floor(ins_c*(2**(MAX_BITS-1)))/2**(MAX_BITS-1)
+  #ins_c = np.clip(ins, -1, (2**(MAX_BITS-1)-1)/2**(MAX_BITS-1))
+  #ins_q = np.floor(ins_c*(2**(MAX_BITS-1)))/2**(MAX_BITS-1)
 
-  inte_out = integrator_q(ins,R)
+  Q = int(np.log2(R))
+  inte_out = integrator_q(ins,Q)
 
   inte_samp = sample(inte_out, R, P)
 
-  comb_out = comb_q(inte_samp, M, R)
+  comb_out = comb_q(inte_samp, M, Q)
 
   return comb_out
 
@@ -87,8 +95,11 @@ def GenSin( N, F ):
 
 def get_att(R,N,M,F):
   sin_data = GenSin(NUM, F)
+
+  sin_data_c = np.clip(sin_data, -1, (2**(MAX_BITS-1)-1)/2**(MAX_BITS-1))
+  sin_data_q = np.floor(sin_data_c*(2**(MAX_BITS-1)))/2**(MAX_BITS-1)
   #print(sin_data[0:20])
-  cic_out = CIC_Q(sin_data, R, N, M)
+  cic_out = CIC_Q(sin_data_q, R, N, M)
   #print(cic_out)
   return max(cic_out)
 
