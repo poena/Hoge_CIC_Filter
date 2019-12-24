@@ -1,6 +1,7 @@
 from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
+import sys, getopt
 
 #R = 32
 #N = 1
@@ -65,12 +66,12 @@ def plot(R,N,M,F):
   #print(sin_data.size)
   #print(cic_out.size)
 
-  print(max(cic_out))
+  #print(max(cic_out))
 
   t = np.linspace(0, 1, 4*int(NUM/(FS/F))+1)
   P = int(R/2) #sample phase
   PP = int(P/(FS/1000))
-  print(FS/F)
+  #print(FS/F)
   ts = sample(t, R, P)
 
   #cic_out_delay = np.zeros(cic_out.size)
@@ -91,16 +92,73 @@ def plot(R,N,M,F):
 
 def get_att(R,N,M,F):
   sin_data = GenSin(NUM, F)
+  #print(sin_data[0:20])
   cic_out = CIC(sin_data, R, N, M)
+  #print(cic_out)
   return max(cic_out)
 
 
-#print(get_att(2,1,1,100000))
+#print(get_att(2,1,1,50000))
+#sin_data = GenSin(10000, 100000)
+#c = 10000/(FS/100000)
+#print(c)
 
+def cic_impl(R, N, M):
+  freq = FS*(2**np.linspace(-9,10,1901))
+  #print(freq)
+  att = np.zeros(freq.size)
+  i = 0;
+  for f in freq:
+    att[i] = get_att(R,N,M,f)
+    i = i+1
+    
+  attdb = 10 * np.log(att)
+
+  kstr = 'R={0}, M={1}, N = {2}'.format(R, 1, 1)
+  plt.plot(freq, attdb, 'b-', label=kstr)
+  plt.legend()
+  plt.grid()
+  plt.grid(which='both',axis='x')
+  plt.xlim([100, 1e6])
+  plt.ylim([-200, 0])
+  plt.xlabel('Sampling Rate [Hz]')
+  plt.ylabel('Attenuation [dB]')
+  plt.xscale('log')
+  plt.show()
+
+def main(argv):
+  R = 2
+  N = 1
+  M = 1
+  try:
+    opts, args = getopt.getopt(argv,"hr:n:m:")
+  except getopt.GetoptError:
+    print('cic_implement.py -r <over sample rate> -n[1] <number state> -m[1] <value of delay>')
+    sys.exit(2)
+  for opt, arg in opts:
+    if opt == '-h':
+      print('cic_implement.py -r 2')
+      sys.exit()
+    elif opt in ("-r"):
+      R = int(arg)
+    elif opt in ("-m"):
+      M = int(arg)
+    elif opt in ("-n"):
+      N = int(arg)
+  print('R={0}, M={1}, N = {2}'.format(R, M, N))
+
+  cic_impl(R,N,M)
+
+main(sys.argv[1:])
+
+'''
 r = 4
 MIN = 1e2
 MAX = 1e6
-freq = 10**np.linspace(2,6,1001)
+MINe = int(np.log2(MIN/FS)-1)
+MAXe = int(np.log2(MAX/FS)+1)
+freq = FS*(2**np.linspace(-9,10,1901))
+print(freq)
 att = np.zeros(freq.size)
 i = 0;
 for f in freq:
@@ -123,4 +181,4 @@ plt.ylabel('Attenuation [dB]')
 plt.xscale('log')
 plt.show()
 #main()
-
+'''
