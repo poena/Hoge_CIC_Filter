@@ -1,4 +1,5 @@
 from scipy import signal
+from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 import sys, getopt
@@ -12,6 +13,21 @@ FS = 200000
 #w = np.linespace(1/NUM, 1, NUM)
 #win = np.sin(2 * w * np.pi)
 
+def func_sin(x, A, F):
+  c = NUM/(FS/F)
+  return A*np.sin(c * x * 2*np.pi)
+
+def sin_fit(y, F, R, mina, maxa, guessA):
+  w = np.linspace(0, 1, NUM+1)
+  P = int(R/2)
+  x = sample( w, R, P)
+  popt, pcov = curve_fit(func_sin, x, y, p0=[max(guessA,mina),F], bounds=([mina,F-1e-5],[1.5,F+1e-5]))
+  perr = np.sqrt(np.diag(pcov))
+  if(perr[0] > 0.1):
+    print("fit: A=%5.3f, f=%5.3f" % tuple(popt))
+    print(["error:",perr])
+  return popt
+  
 
 def integrator( ins ):
   reg = 0
@@ -48,11 +64,11 @@ def CIC( ins, R, N, M ):
   return comb_out/(R*M)
 
 def GenSin( N, F ):
-  c = N/(FS/F)
-  #w = np.linspace(0, 1, int(c)*N+1)
+  #c = N/(FS/F)
   w = np.linspace(0, 1, N+1)
-  win = np.sin(c * w * 2*np.pi)
-  return win
+  #win = np.sin(c * w * 2*np.pi)
+  #return win
+  return func_sin(w, 1.0, F)
 
 def plot(R,N,M,F):
   #R = 2
@@ -63,14 +79,18 @@ def plot(R,N,M,F):
   print("CIC Implement with R={0}, N={1}, M={2}!".format(R,N,M))
   sin_data = GenSin(NUM, F)
   cic_out = CIC(sin_data, R, N, M)
+  mina = min(np.abs(cic_out))
+  maxa = max(np.abs(cic_out))
+  sin_fit(cic_out,F,R,mina, maxa, 1)
   #print(sin_data.size)
   #print(cic_out.size)
 
   #print(max(cic_out))
 
-  t = np.linspace(0, 1, 4*int(NUM/(FS/F))+1)
+  #t = np.linspace(0, 1, 4*int(NUM/(FS/F))+1)
+  t = np.linspace(0, 1, NUM+1)
   P = int(R/2) #sample phase
-  PP = int(P/(FS/1000))
+  #PP = int(P/(FS/1000))
   #print(FS/F)
   ts = sample(t, R, P)
 
@@ -90,12 +110,18 @@ def plot(R,N,M,F):
   plt.ylabel('Attenuation [V]')
   plt.show()
 
-def get_att(R,N,M,F):
+def get_att(R,N,M,F, guessA):
   sin_data = GenSin(NUM, F)
   #print(sin_data[0:20])
   cic_out = CIC(sin_data, R, N, M)
+  maxa = max(np.abs(cic_out))
+  mina = min(np.abs(cic_out))
+  [A1, F1] = sin_fit(cic_out,F,R,mina, maxa, guessA)
+
+  print('fit:{0},max:{1},min:{2}'.format(A1,max(np.abs(cic_out)),min(np.abs(cic_out))))
   #print(cic_out)
-  return max(cic_out)
+  #return max(cic_out)
+  return A1
 
 
 #print(get_att(2,1,1,50000))
@@ -108,8 +134,10 @@ def cic_impl(R, N, M):
   #print(freq)
   att = np.zeros(freq.size)
   i = 0;
+  guessA = 1;
   for f in freq:
-    att[i] = get_att(R,N,M,f)
+    att[i] = get_att(R,N,M,f, guessA)
+    guessA = att[i]
     i = i+1
     
   attdb = 10 * np.log(att)
@@ -150,6 +178,7 @@ def main(argv):
   cic_impl(R,N,M)
 
 main(sys.argv[1:])
+#plot(32,1,1,20000)
 
 '''
 r = 4
@@ -165,9 +194,9 @@ for f in freq:
   att[i] = get_att(r,1,1,f)
   i = i+1
     
-Attdb = 10 * np.log(att)
-print(max(Attdb))
-print(min(Attdb))
+#Attdb = 10 * np.log(att)
+#print(max(Attdb))
+#print(min(Attdb))
 #print(att)
 kstr = 'R={0}, M={1}, N = {2}'.format(r, 1, 1)
 plt.plot(freq, Attdb, 'b-', label=kstr)
