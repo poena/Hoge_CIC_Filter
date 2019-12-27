@@ -80,7 +80,9 @@ assign data_out = data_reg;
 
 always_ff @(negedge clk iff reset_n == 1 or negedge reset_n)
 begin
-    if(trunc) flag_t   <= {data_sum[ODW],~flag_t[0]};
+    if (!reset_n)
+        flag_t <= 2'b0;
+    else if(trunc) flag_t   <= {data_sum[ODW],~flag_t[0]};
 end
 
 endmodule
