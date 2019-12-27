@@ -2,12 +2,10 @@
 all: comp run
 
 comp:
-	vcs -full64 -debug_pp +vcs+dumpvars+cic_test.vcd -sverilog test_top.sv ../cic_filter.sv ../comb.sv ../integrator.sv
-	#vcs -full64 -debug_pp +vpdfile+cic_test.vpd -sverilog test_top.sv ../cic_filter.sv ../comb.sv ../integrator.sv
+	vcs -full64 -debug_pp +vcs+vcdpluson +memcbk -sverilog test_top.sv ../cic_filter.sv ../comb.sv ../integrator.sv |tee comp.log
 
 run:
-	./simv
-	#vcd2vpd cic_test.vcd cic_test.vpd
+	./simv -vpd_file cic_test.vpd |tee run.log
 
 clean:
 	rm *.vpd *.vcd

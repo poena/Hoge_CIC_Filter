@@ -22,6 +22,7 @@ assign int_in = data_in;
 
 integrator #(DW, DW+OW+1) int_inst(
     .clk        ( clk       ),
+    .clk_div    ( clk_div   ),
     .reset_n    ( reset_n   ),
     .os_sel     ( os_sel    ),
     .data_in    ( int_in    ),
@@ -32,7 +33,7 @@ integrator #(DW, DW+OW+1) int_inst(
 assign comb_in = int_out;
 
 comb #(DW+OW+1, DW, 1) comb_inst(
-    .clk        ( clk_div   ),
+    .clk_div    ( clk_div   ),
     .reset_n    ( reset_n   ), 
     .os_sel     ( os_sel    ),
     .flag_in    ( flag_t    ),

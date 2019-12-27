@@ -28,7 +28,8 @@ integer data_file;
 integer scan_file;
 integer inte_file;
 logic signed [DW-1:0] captured_data;
-integer idx;
+integer idx,flag_idx;
+integer str_pt;
 
 //initial begin
 //  $vpdplusfile("vpd");
@@ -89,7 +90,7 @@ begin
 end
 
 string inte_data, inte_flag;
-integer flag_v;
+integer flag_v,data_v;
 integer str_len = 1;
 
 initial
@@ -113,15 +114,21 @@ begin
 
   $fclose(inte_file);
 
-  idx = 0;
+  flag_idx = 0;
+  str_pt = 0;
   $display("string len is %d",inte_flag.len());
   while(str_len > 0) begin
     @(posedge clk);
-    str_len = $sscanf(inte_flag.substr(idx*2), "%d,", flag_v);
-    if(str_len > 0) begin
-      $display("id[%d]:%d,\n",idx,flag_v, str_len); 
+    str_len = $sscanf(inte_flag.substr(flag_idx*2), "%d,", flag_v);
+    $sscanf(inte_data.substr(str_pt), "%d,", data_v);
+    while(inte_data.getc(str_pt) != ",") begin
+        str_pt++;
     end
-    idx++;
+    str_pt++;
+    if(str_len > 0) begin
+      $display("id[%d]:flag %d,data %d\n",flag_idx,flag_v, data_v, str_len); 
+    end
+    flag_idx++;
   end
 
 end
