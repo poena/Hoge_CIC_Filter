@@ -8,3 +8,6 @@ comp:
 run:
 	./simv
 	#vcd2vpd cic_test.vcd cic_test.vpd
+
+clean:
+	rm *.vpd *.vcd

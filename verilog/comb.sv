@@ -9,10 +9,12 @@ module comb
     output  reg [ODW-1:0] data_out 
 );
 
+localparam TW = IDW-6; //TW must great than or equal to ODW
+
 reg        [IDW-1:0] data_reg[DM];
 reg        [    1:0] flag_reg[DM];
 reg        [IDW  :0] data_sub;
-wire       [IDW  :0] trunc_value;
+reg        [IDW  :0] trunc_value;
 wire                 trunc_fix;
 wire                 trunc_sign;
 wire       [IDW+1:0] data_sub_fix;
@@ -22,7 +24,7 @@ reg                  sub_overflow_dn;
 ///////////////////////////////////////////////////////////
 assign trunc_fix = (flag_in != flag_reg[DM-1]);
 assign trunc_sign = flag_in[1];
-assign trunc_value = {trunc_fix&trunc_sign,trunc_fix,{(IDW-1){1'b0}}};
+//assign trunc_value = {trunc_fix&trunc_sign,trunc_fix,{(IDW-1){1'b0}}};
 
 assign data_sub     = data_in - data_reg[DM-1];
 assign data_sub_fix = data_sub + trunc_value;
@@ -31,28 +33,34 @@ always_comb
 begin
   case (os_sel)
     3'b001 : begin
-        sub_overflow_up = (~(|data_sub_fix[IDW:ODW+0]))&(~data_sub_fix[IDW+1]);
+        sub_overflow_up = ( (|data_sub_fix[IDW:ODW+0]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+0]))&( data_sub_fix[IDW+1]);
+        trunc_value     = {{(6){trunc_fix&trunc_sign}},trunc_fix,{(TW){1'b0}}};
     end
     3'b010 : begin
-        sub_overflow_up = (~(|data_sub_fix[IDW:ODW+1]))&(~data_sub_fix[IDW+1]);
+        sub_overflow_up = ( (|data_sub_fix[IDW:ODW+1]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+1]))&( data_sub_fix[IDW+1]);
+        trunc_value     = {{(5){trunc_fix&trunc_sign}},trunc_fix,{(TW+1){1'b0}}};
     end
     3'b011 : begin
-        sub_overflow_up = (~(|data_sub_fix[IDW:ODW+2]))&(~data_sub_fix[IDW+1]);
+        sub_overflow_up = ( (|data_sub_fix[IDW:ODW+2]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+2]))&( data_sub_fix[IDW+1]);
+        trunc_value     = {{(4){trunc_fix&trunc_sign}},trunc_fix,{(TW+2){1'b0}}};
     end
     3'b100 : begin
-        sub_overflow_up = (~(|data_sub_fix[IDW:ODW+3]))&(~data_sub_fix[IDW+1]);
+        sub_overflow_up = ( (|data_sub_fix[IDW:ODW+3]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+3]))&( data_sub_fix[IDW+1]);
+        trunc_value     = {{(3){trunc_fix&trunc_sign}},trunc_fix,{(TW+3){1'b0}}};
     end
     3'b101 : begin
-        sub_overflow_up = (~(|data_sub_fix[IDW:ODW+4]))&(~data_sub_fix[IDW+1]);
+        sub_overflow_up = ( (|data_sub_fix[IDW:ODW+4]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+4]))&( data_sub_fix[IDW+1]);
+        trunc_value     = {{(2){trunc_fix&trunc_sign}},trunc_fix,{(TW+4){1'b0}}};
     end
     3'b110 : begin
-        sub_overflow_up = (~(|data_sub_fix[IDW:ODW+5]))&(~data_sub_fix[IDW+1]);
+        sub_overflow_up = ( (|data_sub_fix[IDW:ODW+5]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+5]))&( data_sub_fix[IDW+1]);
+        trunc_value     = {{(1){trunc_fix&trunc_sign}},trunc_fix,{(TW+5){1'b0}}};
     end
     default: begin
         sub_overflow_up = 1'b0;

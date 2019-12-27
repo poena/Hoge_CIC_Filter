@@ -15,7 +15,7 @@ module integrator #(
 
 //TW is local valid bits
 //TW should be IDW+log2(OS), with sign
-localparam TW = ODW-IDW-6; //TW must great than 0
+localparam TW = ODW-6; //TW must great than or equal to IDW
 
 reg  [ODW-1:0] data_reg;
 wire [ODW-1:0] data_in_ext;
@@ -31,34 +31,34 @@ always_comb
 begin
     case (os_sel)
         3'b001 : begin
-            data_sum_trunc[ODW-1:0] = {{(ODW-IDW-0){data_sum[ODW]}},data_sum[IDW-1:0]}; //2 OS
-            trunc = ~((|data_sum[ODW-1:IDW])&(~data_sum[ODW]) ||
-                      (&data_sum[ODW-1:IDW])&  data_sum[ODW]  );
+            data_sum_trunc[ODW-1:0] = {{(ODW-TW-0){data_sum[ODW]}},data_sum[TW-1:0]}; //2 OS
+            trunc = (( |data_sum[ODW-1:TW])&(~data_sum[ODW]) ||
+                     (~&data_sum[ODW-1:TW])&  data_sum[ODW]  );
         end
         3'b010 : begin
-            data_sum_trunc[ODW-1:0] = {{(ODW-IDW-1){data_sum[ODW]}},data_sum[IDW+0:0]}; //4 OS
-            trunc = ~((|data_sum[ODW-1:IDW+1])&(~data_sum[ODW]) ||
-                      (&data_sum[ODW-1:IDW+1])&  data_sum[ODW]  );
+            data_sum_trunc[ODW-1:0] = {{(ODW-TW-1){data_sum[ODW]}},data_sum[TW+0:0]}; //4 OS
+            trunc = (( |data_sum[ODW-1:TW+1])&(~data_sum[ODW]) ||
+                     (~&data_sum[ODW-1:TW+1])&  data_sum[ODW]  );
         end
         3'b011 : begin
-            data_sum_trunc[ODW-1:0] = {{(ODW-IDW-2){data_sum[ODW]}},data_sum[IDW+1:0]}; //8 OS
-            trunc = ~((|data_sum[ODW-1:IDW+2])&(~data_sum[ODW]) ||
-                      (&data_sum[ODW-1:IDW+2])&  data_sum[ODW]  );
+            data_sum_trunc[ODW-1:0] = {{(ODW-TW-2){data_sum[ODW]}},data_sum[TW+1:0]}; //8 OS
+            trunc = (( |data_sum[ODW-1:TW+2])&(~data_sum[ODW]) ||
+                     (~&data_sum[ODW-1:TW+2])&  data_sum[ODW]  );
         end
         3'b100 : begin
-            data_sum_trunc[ODW-1:0] = {{(ODW-IDW-3){data_sum[ODW]}},data_sum[IDW+2:0]}; //16 OS
-            trunc = ~((|data_sum[ODW-1:IDW+3])&(~data_sum[ODW]) ||
-                      (&data_sum[ODW-1:IDW+3])&  data_sum[ODW]  );
+            data_sum_trunc[ODW-1:0] = {{(ODW-TW-3){data_sum[ODW]}},data_sum[TW+2:0]}; //16 OS
+            trunc = (( |data_sum[ODW-1:TW+3])&(~data_sum[ODW]) ||
+                     (~&data_sum[ODW-1:TW+3])&  data_sum[ODW]  );
         end
         3'b101 : begin
-            data_sum_trunc[ODW-1:0] = {{(ODW-IDW-4){data_sum[ODW]}},data_sum[IDW+3:0]}; //32 OS
-            trunc = ~((|data_sum[ODW-1:IDW+4])&(~data_sum[ODW]) ||
-                      (&data_sum[ODW-1:IDW+4])&  data_sum[ODW]  );
+            data_sum_trunc[ODW-1:0] = {{(ODW-TW-4){data_sum[ODW]}},data_sum[TW+3:0]}; //32 OS
+            trunc = (( |data_sum[ODW-1:TW+4])&(~data_sum[ODW]) ||
+                     (~&data_sum[ODW-1:TW+4])&  data_sum[ODW]  );
         end
         3'b110 : begin
-            data_sum_trunc[ODW-1:0] = {{(ODW-IDW-5){data_sum[ODW]}},data_sum[IDW+4:0]}; //64 OS
-            trunc = ~((|data_sum[ODW-1:IDW+5])&(~data_sum[ODW]) ||
-                      (&data_sum[ODW-1:IDW+5])&  data_sum[ODW]  );
+            data_sum_trunc[ODW-1:0] = {{(ODW-TW-5){data_sum[ODW]}},data_sum[TW+4:0]}; //64 OS
+            trunc = (( |data_sum[ODW-1:TW+5])&(~data_sum[ODW]) ||
+                     (~&data_sum[ODW-1:TW+5])&  data_sum[ODW]  );
         end
         //3'b111 : //INVALID
         default: begin
