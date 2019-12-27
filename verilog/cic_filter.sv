@@ -5,16 +5,16 @@ module cic_filter
     input                   clk_div,
     input                   reset_n,
     input          [2:0]    os_sel,
-    input   signed [DW-1:0] data_in,
-    output  signed [DW-1:0] data_out 
-)
+    input          [DW-1:0] data_in,
+    output         [DW-1:0] data_out 
+);
 
 //localparam MAX_OS = 64;
 localparam OW     =  6;
 
 wire        [DW-1   :0] int_in;
 wire        [DW+OW  :0] int_out;
-wire        [2      :0] flag_t;
+wire        [1      :0] flag_t;
 wire        [DW+OW  :0] comb_in;
 wire        [DW-1   :0] comb_out;
 

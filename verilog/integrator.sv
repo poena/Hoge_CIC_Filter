@@ -20,7 +20,8 @@ localparam TW = ODW-IDW-6; //TW must great than 0
 reg  [ODW-1:0] data_reg;
 wire [ODW-1:0] data_in_ext;
 wire [ODW  :0] data_sum;
-wire [ODW-1:0] data_sum_trunc;
+reg  [ODW-1:0] data_sum_trunc;
+reg            trunc;
 
 assign data_in_ext = {{(ODW-IDW+1){data_in[IDW-1]}},data_in[IDW-2:0]};
 
@@ -67,7 +68,7 @@ begin
     endcase
 end
 
-always_ff @(negedge clk iff reset_n == 1 or negedge rest_n)
+always_ff @(negedge clk iff reset_n == 1 or negedge reset_n)
 begin
     if (!reset_n)
         data_reg <= '0;
@@ -77,7 +78,7 @@ end
 
 assign data_out = data_reg;
 
-always_ff @(negedge clk iff reset_n == 1 or negedge rest_n)
+always_ff @(negedge clk iff reset_n == 1 or negedge reset_n)
 begin
     if(trunc) flag_t   <= {data_sum[ODW],~flag_t[0]};
 end

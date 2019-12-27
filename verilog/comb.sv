@@ -1,23 +1,23 @@
 module comb
 #(parameter IDW = 23, ODW = 16, DM = 1)
 (
-    input             clk      ,
-    input             reset_n  ,
-    input   [    2:0] os_sel   ,
-    input   [IDW-1:0] data_in  ,
-    input   [    1:0] flag_in  ,
-    output  [ODW-1:0] data_out 
+    input                 clk      ,
+    input                 reset_n  ,
+    input       [    2:0] os_sel   ,
+    input       [IDW-1:0] data_in  ,
+    input       [    1:0] flag_in  ,
+    output  reg [ODW-1:0] data_out 
 );
 
-reg        [IDW-1:0] data_reg[g];
-reg        [    1:0] flag_reg[g];
+reg        [IDW-1:0] data_reg[DM];
+reg        [    1:0] flag_reg[DM];
 reg        [IDW  :0] data_sub;
 wire       [IDW  :0] trunc_value;
 wire                 trunc_fix;
 wire                 trunc_sign;
 wire       [IDW+1:0] data_sub_fix;
-wire                 sub_overflow_up;
-wire                 sub_overflow_dn;
+reg                  sub_overflow_up;
+reg                  sub_overflow_dn;
 
 ///////////////////////////////////////////////////////////
 assign trunc_fix = (flag_in != flag_reg[DM-1]);
@@ -29,7 +29,7 @@ assign data_sub_fix = data_sub + trunc_value;
 
 always_comb
 begin
-  case (os _sel)
+  case (os_sel)
     3'b001 : begin
         sub_overflow_up = (~(|data_sub_fix[IDW:ODW+0]))&(~data_sub_fix[IDW+1]);
         sub_overflow_dn = (~(&data_sub_fix[IDW:ODW+0]))&( data_sub_fix[IDW+1]);
@@ -102,7 +102,7 @@ begin
         3'b100 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+2:4]};
         3'b101 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+3:5]};
         3'b110 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+4:6]};
-        default: data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW-2:0]};;
+        default: data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW-2:0]};
       endcase
 end
 
