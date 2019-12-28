@@ -21,7 +21,7 @@ cic_filter #(16) DUT(
 );
 
 `define INPUT_FILE "../data/cic_testdata.csv"
-`define OUTPUT_FILE "./cic_out.csv"
+`define OUTPUT_FILE `"./cic_out_`OS.csv`"
 `define NULL 0
 
 integer data_file;
@@ -40,7 +40,11 @@ end
 
 initial begin
   reset_n = 0;
-  os_sel = 3'b001;
+`ifdef OS
+  os_sel = `OS;
+`else
+  os_sel = 2;
+`endif
   #10000 reset_n = 1;
 end
 
@@ -87,7 +91,7 @@ begin
     data_in = captured_data;
     if ($feof(data_file)) begin
       $fclose(data_file);
-      repeat(4) @(posedge clk);
+      repeat(3) @(posedge clk_div);
       enable_write=0; 
       repeat(10) @(posedge clk);
       $fclose(result_file);
@@ -100,13 +104,13 @@ end
 initial
 begin
   wait(enable_write);
-  repeat(5) @(negedge clk);
+  repeat(3) @(negedge clk_div);
 
 
   wr_idx = 0;
   while(enable_write) begin
     @(posedge clk_div);
-    $display("id[%d]:%d @%t\n",wr_idx,data_out,$time); 
+    $display("id[%d]:%5d @%t\n",wr_idx,$signed(data_out),$time); 
     $fwrite(result_file,"%5d,", $signed(data_out)); 
     wr_idx++;
   end
