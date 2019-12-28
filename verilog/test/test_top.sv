@@ -20,21 +20,18 @@ cic_filter #(16) DUT(
     .data_out   ( data_out )
 );
 
-`define INPUT_FILE "cic_testdata.csv"
-`define INTE_OUT_FILE "cic_int_out.csv"
+`define INPUT_FILE "../data/cic_testdata.csv"
+`define OUTPUT_FILE "./cic_out.csv"
 `define NULL 0
 
 integer data_file;
 integer scan_file;
-integer inte_file;
+integer result_file;
 logic signed [DW-1:0] captured_data;
-integer idx,flag_idx;
+integer idx,wr_idx,flag_idx;
 integer str_pt;
+logic enable_write=0;
 
-//initial begin
-//  $vpdplusfile("vpd");
-//  $vpdpluson();
-//end
 initial
 begin
   clk = 0;
@@ -67,13 +64,20 @@ initial
 begin
   data_in = '0;
   data_file = $fopen(`INPUT_FILE, "r");
+  result_file = $fopen(`OUTPUT_FILE, "w");
   if (data_file == `NULL) begin
     $display("Input data_file handle was NULL");
+    $finish;
+  end
+  result_file = $fopen(`OUTPUT_FILE, "w");
+  if (result_file == `NULL) begin
+    $display("Output `result_file  can't open.");
     $finish;
   end
 
   wait(reset_n);
   repeat(100) @(posedge clk);
+  enable_write=1;
 
   idx = 0;
   while(1) begin
@@ -83,9 +87,28 @@ begin
     data_in = captured_data;
     if ($feof(data_file)) begin
       $fclose(data_file);
+      repeat(4) @(posedge clk);
+      enable_write=0; 
+      repeat(10) @(posedge clk);
+      $fclose(result_file);
       $finish;
     end
     idx++;
+  end
+end
+
+initial
+begin
+  wait(enable_write);
+  repeat(5) @(negedge clk);
+
+
+  wr_idx = 0;
+  while(enable_write) begin
+    @(posedge clk_div);
+    $display("id[%d]:%d @%t\n",wr_idx,data_out,$time); 
+    $fwrite(result_file,"%5d,", $signed(data_out)); 
+    wr_idx++;
   end
 end
 
@@ -93,6 +116,7 @@ string inte_data, inte_flag;
 integer flag_v,data_v;
 integer str_len = 1;
 
+/*
 initial
 begin
   inte_file = $fopen(`INTE_OUT_FILE, "r");
@@ -132,5 +156,6 @@ begin
   end
 
 end
+*/
 
 endmodule
