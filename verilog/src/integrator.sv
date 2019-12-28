@@ -77,6 +77,8 @@ always_ff @(negedge clk iff reset_n == 1 or negedge reset_n)
 begin
     if (!reset_n)
         data_reg <= '0;
+    else if (os_sel == 3'b000)
+        data_reg <= '0;
     else
         data_reg <= data_sum_trunc;
 end

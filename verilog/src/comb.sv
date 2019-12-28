@@ -65,6 +65,7 @@ begin
     default: begin
         sub_overflow_up = 1'b0;
         sub_overflow_dn = 1'b0;
+        trunc_value     = '0;
     end
   endcase
 end

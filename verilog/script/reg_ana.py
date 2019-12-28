@@ -10,7 +10,7 @@ plt.close('all')
 
 def checkfile():
     flist =[]
-    for i in [1,2,3,4,5,6]:
+    for i in [0,1,2,3,4,5,6]:
         fname = './cic_out_'+str(i)+'.csv'
         if os.path.isfile(fname):
             flist.append(fname)
@@ -71,7 +71,7 @@ def getSNR(testfile,plot_en=0):
     signal_dc = signal - np.mean(signal)
     # Take slice
     N = 2**int(np.log2(len(signal)))
-    print(N)
+    #print(N)
     #win = np.hamming(N)
     win = None
     freq, s_dbfs = dbfft(signal_dc[0:N], fs, win,2**15)
@@ -85,7 +85,7 @@ def getSNR(testfile,plot_en=0):
     n_pwr[peak] = 0
     noise_aver = (10*np.log10(np.sum(n_pwr**2)))
     SNR = s_db[peak] - noise_aver
-    print('SNDR is {0}'.format(SNR))
+    #print('SNDR is {0}'.format(SNR))
     if plot_en :
         plt.plot(freq, s_db)
         plt.grid(True)
@@ -99,7 +99,8 @@ def main():
     snr = []
     for f in flist:
         snr.append(getSNR(f,plot_en=0))
-    print(snr)
+    print('OS: \t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d' % (0,2,4,8,16,32,64))
+    print('\t%3.3f\t%3.3f\t%3.3f\t%3.3f\t%3.3f\t%3.3f\t%3.3f' % tuple(snr))
 
 if __name__ == "__main__":
     main()
