@@ -58,7 +58,7 @@ begin
         dv <= 1'b0;
     end else begin
         counter <= (counter < 2**os_sel-1) ? counter + 1 : '0;
-        dv <= (counter == 2**os_sel-1);
+        dv <= (counter > 2**(os_sel-1)-1);
     end
 end
 
@@ -81,6 +81,7 @@ begin
 
   wait(reset_n);
   repeat(100) @(posedge clk);
+  @(posedge clk_div);
   enable_write=1;
 
   idx = 0;
