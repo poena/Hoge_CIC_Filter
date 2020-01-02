@@ -73,7 +73,7 @@ begin
     endcase
 end
 
-always_ff @(negedge clk iff reset_n == 1 or negedge reset_n)
+always_ff @(negedge clk or negedge reset_n)
 begin
     if (!reset_n)
         data_reg <= '0;
@@ -83,7 +83,7 @@ begin
         data_reg <= data_sum_trunc;
 end
 
-always_ff @(negedge clk iff reset_n == 1 or negedge reset_n)
+always_ff @(negedge clk or negedge reset_n)
 begin
     if (!reset_n)
         flag_reg <= 2'b0;
@@ -94,7 +94,7 @@ end
 // clk_div domain
 assign flag_comb = trunc?{data_sum[ODW],~flag_reg[0]}:flag_reg;
 
-always_ff @(posedge clk_div iff reset_n == 1 or negedge reset_n)
+always_ff @(posedge clk_div or negedge reset_n)
 begin
     if (!reset_n) begin
         data_out <= '0;

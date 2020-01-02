@@ -71,7 +71,7 @@ begin
 end
 
 //integer i;
-always_ff @(posedge clk_div iff reset_n == 1 or negedge reset_n)
+always_ff @(posedge clk_div or negedge reset_n)
 begin
     if (!reset_n) begin
         data_reg <= '0;
@@ -85,23 +85,23 @@ begin
     end
 end
 
-always_ff @(posedge clk_div iff reset_n == 1 or negedge reset_n)
+always_ff @(posedge clk_div or negedge reset_n)
 begin
     if (!reset_n)
       data_out <= '0;
     else if(sub_overflow_up)
-      data_out[ODW-1:0] = {1'b0,{(IDW-1){1'b1}}};
+      data_out[ODW-1:0] <= {1'b0,{(IDW-1){1'b1}}};
     else if(sub_overflow_dn)
-      data_out[ODW-1:0] = {1'b1,{(IDW-1){1'b0}}};
+      data_out[ODW-1:0] <= {1'b1,{(IDW-1){1'b0}}};
     else
       case(os_sel)
-        3'b001 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW-1:1]};
-        3'b010 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+0:2]};
-        3'b011 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+1:3]};
-        3'b100 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+2:4]};
-        3'b101 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+3:5]};
-        3'b110 : data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW+4:6]};
-        default: data_out[ODW-1:0] = {data_sub_fix[IDW+1],data_sub_fix[ODW-2:0]};
+        3'b001 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW-1:1]};
+        3'b010 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW+0:2]};
+        3'b011 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW+1:3]};
+        3'b100 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW+2:4]};
+        3'b101 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW+3:5]};
+        3'b110 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW+4:6]};
+        default: data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW-2:0]};
       endcase
 end
 

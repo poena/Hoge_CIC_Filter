@@ -23,5 +23,5 @@ regression: ${JOBS} ; echo "$@ success"
 ${JOBS}: job% : ; vcs -full64 -debug_pp +vcs+vcdpluson +memcbk +define+OS=$* -sverilog ./test_top.sv ../src/cic_filter.sv ../src/comb.sv ../src/integrator.sv |tee comp.log ; ./simv -vpd_file cic_test.vpd |tee run.log
 
 clean:
-	rm *.vpd *.vcd *.csv
+	rm -rf *.vpd *.vcd *.csv
 

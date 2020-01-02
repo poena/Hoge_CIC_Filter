@@ -45,7 +45,7 @@ initial begin
 `else
   os_sel = 2;
 `endif
-  #10000 reset_n = 1;
+  #10000000 reset_n = 1;
 end
 
 always_ff @(posedge clk or negedge reset_n)
