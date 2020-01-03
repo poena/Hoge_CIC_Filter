@@ -90,9 +90,9 @@ begin
     if (!reset_n)
       data_out <= '0;
     else if(sub_overflow_up)
-      data_out[ODW-1:0] <= {1'b0,{(IDW-1){1'b1}}};
+      data_out[ODW-1:0] <= {1'b0,{(ODW-1){1'b1}}};
     else if(sub_overflow_dn)
-      data_out[ODW-1:0] <= {1'b1,{(IDW-1){1'b0}}};
+      data_out[ODW-1:0] <= {1'b1,{(ODW-1){1'b0}}};
     else
       case(os_sel)
         3'b001 : data_out[ODW-1:0] <= {data_sub_fix[IDW+1],data_sub_fix[ODW-1:1]};
