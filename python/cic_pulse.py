@@ -21,19 +21,6 @@ def GenPulse( N, F ):
     w[0] = 1
     return w
 
-def intp(ins,R,mode):
-    if mode==1:
-        return  np.repeat(ins,R)
-    elif mode ==0:
-        n = np.size(ins)
-
-        out = np.zeros((1,R*n),dtype=ins.dtype)
-        out[:,::R] = ins*R
-        return out.flatten()
-    else:
-        print("invalid mode.")
-        return 0
-
 
 # test= np.array([1,2,3,4,5,6])
 # test_i = intp(test,3,0)
@@ -43,10 +30,10 @@ def intp(ins,R,mode):
 pulse = GenPulse(N,Fs)
 
 l1_out = cic.CIC(pulse,320,1,1)
-l1_out_ext = intp(l1_out,320,1)
+l1_out_ext = cic.intp(l1_out,320,1)
 
 l2_out=cic.CIC(l1_out_ext,1,L,384)
-l2_out_ext = intp(l2_out,1,1)
+l2_out_ext = cic.intp(l2_out,1,1)
 
 # l3_out=cic.CIC(l2_out_ext,1,1,320)
 # l3_out_ext = intp(l3_out,1,1)
