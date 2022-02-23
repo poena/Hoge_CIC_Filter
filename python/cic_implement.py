@@ -118,7 +118,7 @@ def get_att(R,N,M,F, guessA):
   mina = min(np.abs(cic_out))
   [A1, F1] = sin_fit(cic_out,F,R,mina, maxa, guessA)
 
-  print('fit:{0},max:{1},min:{2}'.format(A1,max(np.abs(cic_out)),min(np.abs(cic_out))))
+  #print('fit:{0},max:{1},min:{2}'.format(A1,max(np.abs(cic_out)),min(np.abs(cic_out))))
   #print(cic_out)
   #return max(cic_out)
   return A1

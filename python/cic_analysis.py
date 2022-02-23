@@ -5,9 +5,9 @@ import sys, getopt
 
 
 def CIC_ANA(R,M,N):
-  Fs = 200000
-  Fmax = 1e6
-  w = np.linspace(1E-5, Fmax/Fs, 10000)
+  Fs = 19200;#200000
+  #Fmax = 1e6
+  w = np.linspace(1E-5, 1, 10000)
   f = w * Fs
   
   # R is the decimation ratio, N is the filter order, M is a free number usually 1 or 2
@@ -22,11 +22,11 @@ def CIC_ANA(R,M,N):
   plt.legend()
   plt.grid()
   plt.grid(which='both',axis='x')
-  plt.xlim([100, 1e6])
-  plt.ylim([-200, 0])
+  plt.xlim([0, Fs])
+  plt.ylim([-150, 0])
   plt.xlabel('Sampling Rate [Hz]')
   plt.ylabel('Attenuation [dB]')
-  plt.xscale('log')
+  #plt.xscale('log')
   plt.show()
 
 def main(argv):
